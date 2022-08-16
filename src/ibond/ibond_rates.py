@@ -2,9 +2,12 @@ import collections
 import csv
 import datetime
 import io
+from pathlib import Path
 
 from dateutil import relativedelta
 from marshmallow import Schema, fields
+
+IBOND_RATES_FILE_NAME = "ibond_rates.csv"
 
 
 class IBond:
@@ -34,13 +37,15 @@ class IBondRateSchema(Schema):
 # Class to hold the rates table
 class IBondRates:
 
-    def __init__(self, rates_filename="ibond_rates.csv", date_format="%B %d, %Y"):
+    def __init__(self, rates_filename=IBOND_RATES_FILE_NAME, date_format="%B %d, %Y"):
         self.date_format = date_format
         self.rates_list = self._read_rates_file(rates_filename)
         self.rates_map = self._create_rates_map(self.rates_list)
 
     def _read_rates_file(self, file_name):
-        with open(file_name) as csv_file:
+        # print("_read_rates_file, file_name=%s" % file_name)
+        p = Path(__file__).with_name(file_name)
+        with p.open('r') as csv_file:
             csv_reader = csv.DictReader(csv_file)
             # Date,Fixed Rate,Inflation Rate,
             rates_list = []

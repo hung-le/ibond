@@ -1,14 +1,22 @@
 import collections
 import csv
-
-
 # add comment
+from pathlib import Path
+
+import ibond.ibond_rates
+
+INFLATION_RATES_FILE_NAME = "inflation_rates.csv"
+
+FIXED_RATES_FILE_NAME = "fixed_rates.csv"
+
+
 def main():
     table = collections.OrderedDict()
 
-    file_name = "fixed_rates.csv"
-    print("# reading %s" % (file_name))
-    with open(file_name) as csv_file:
+    file_name = FIXED_RATES_FILE_NAME
+    p = Path(__file__).with_name(file_name)
+    print("# reading %s" % (p.absolute()))
+    with p.open('r') as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter="\t")
         for row in csv_reader:
             values = []
@@ -18,9 +26,10 @@ def main():
             table[key] = values
             # print("fixed_rate - %s" % (values))
 
-    file_name = "inflation_rates.csv"
-    print("# reading %s" % (file_name))
-    with open(file_name) as csv_file:
+    file_name = INFLATION_RATES_FILE_NAME
+    p = Path(__file__).with_name(file_name)
+    print("# reading %s" % (p.absolute()))
+    with p.open('r') as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter="\t")
         for row in csv_reader:
             values = []
@@ -37,10 +46,11 @@ def main():
             else:
                 print("WARN: cannot find key=%s" % (key))
 
-    file_name = "ibond_rates.csv"
-    print("# writing %s" % (file_name))
+    file_name = ibond.ibond_rates.IBOND_RATES_FILE_NAME
+    p = Path(__file__).with_name(file_name)
+    print("# writing %s" % (p.absolute()))
     col_names = ["date", "fixed_rate", "inflation_rate"]
-    with open(file_name, "w") as csv_file:
+    with p.open('w') as csv_file:
         csv_writer = csv.writer(csv_file)
         csv_writer.writerow(col_names)
         for rates in table.values():

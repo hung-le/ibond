@@ -3,11 +3,14 @@ import math
 
 import datetime
 import unittest
+from pathlib import Path
 from stringprep import in_table_c11_c12
 
 import dateutil.parser
 
 from ibond import ibond_rates
+
+TEST_RATES_DATA_FILE_NAME = 'test_rates_data.csv'
 
 COL_INFLATION_RATE = 2
 
@@ -98,7 +101,8 @@ def test_read_rates_test_data():
 
     row_number = 0
     header_row = -1
-    with open('test_rates_data.csv', 'r') as file:
+    p = Path(__file__).with_name(TEST_RATES_DATA_FILE_NAME)
+    with p.open('r') as file:
         reader = csv.reader(file)
 
         for row in reader:
