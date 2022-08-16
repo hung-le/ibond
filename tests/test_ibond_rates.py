@@ -1,10 +1,8 @@
 import csv
-import math
-
 import datetime
+import math
 import unittest
 from pathlib import Path
-from stringprep import in_table_c11_c12
 
 import dateutil.parser
 
