@@ -40,11 +40,13 @@ def check_data(schema, data):
         abort(400, exception=str(e))
 
 
-def cmd_sim_min_purchase(denomination, assume_inflation_rate):
-    today = datetime.date.today()
-    issue_date = datetime.datetime(today.year, today.month, 1)
+def cmd_sim_min_purchase(issue_year, issue_month,
+                         end_year, end_month,
+                         denomination, assume_inflation_rate):
+    # today = datetime.date.today()
+    issue_date = datetime.datetime(issue_year, issue_month, 1)
 
-    value_as_of = issue_date + relativedelta.relativedelta(months=12)
+    value_as_of = datetime.datetime(end_year, end_month, 1)
 
     ibond_calculator = IBondCalculator(
         issue_date,
@@ -56,15 +58,30 @@ def cmd_sim_min_purchase(denomination, assume_inflation_rate):
 
 
 class ValuesQuerySchema(Schema):
+    today = datetime.date.today()
+    end_date = today + relativedelta.relativedelta(months=12)
+
+    issue_year = fields.Int(missing=today.year)
+    issue_month = fields.Int(missing=today.month)
+
+    end_year = fields.Int(missing=end_date.year)
+    end_month = fields.Int(missing=end_date.month)
+
     denomination = fields.Float(missing=1000.00)
+
     assume_inflation_rate = fields.Float(missing=0.00)
 
 
-@api.route("/values")
+@api.route("/values", methods=['GET'])
 def get_values():
     parameters = check_data(ValuesQuerySchema, request.args)
     ibond_calculator = cmd_sim_min_purchase(
-        parameters["denomination"], parameters["assume_inflation_rate"]
+        parameters["issue_year"],
+        parameters["issue_month"],
+        parameters["end_year"],
+        parameters["end_month"],
+        parameters["denomination"],
+        parameters["assume_inflation_rate"]
     )
     lookup_table = ibond_calculator.get_lookup_table()
     schema = IBondValueSchema(many=True)

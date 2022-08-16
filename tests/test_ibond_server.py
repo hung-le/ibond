@@ -31,10 +31,38 @@ def test_request_rates(client):
 
 
 def test_request_values(client):
-    response = client.get("/api/values")
+    data = {
+        "issue_year": "2000",
+        "issue_month": "1",
+        "end_year": "2020",
+        "end_month": "1",
+    }
+    response = client.get("/api/values", query_string=data)
     assert response.status_code == 200
     assert response.json["name"] == "values"
     values = response.json["values"]
-    assert len(values) == 13
+    assert len(values) == 241
+
+    expected_first = {
+        'composite_rate': 6.98,
+        'date': '2000-02-01T00:00:00',
+        'fixed_rate': 3.4,
+        'inflation_rate': 1.76,
+        'unit_value': 25.87,
+        'value': 1005.6
+    }
+    expected_last = {
+        'composite_rate': 5.45,
+        'date': '2020-02-01T00:00:00',
+        'fixed_rate': 3.4,
+        'inflation_rate': 1.01,
+        'unit_value': 78.53,
+        'value': 3071.6
+    }
+
+    test_case = unittest.TestCase()
+
     # for value in values:
     #     print(value)
+    test_case.assertDictEqual(values[0], expected_first)
+    test_case.assertDictEqual(values[-1], expected_last)
