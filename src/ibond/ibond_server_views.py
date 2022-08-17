@@ -2,7 +2,7 @@ import datetime
 from os import abort
 
 from dateutil import relativedelta
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 from marshmallow import Schema, fields
 
 from ibond.ibond_rates import IBondRates, IBondRateSchema
@@ -13,10 +13,22 @@ api = Blueprint('api', __name__, url_prefix='/api')
 rates_table = IBondRates()
 
 
+@api.errorhandler(Exception)
+def handle_exception(e):
+    return jsonify(
+        exception=type(e).__name__,
+        message=str(e)
+    ), 400
+
+
 # a simple page that says hello
 @api.route('/hello')
 def get_hello():
-    return 'Hello, World!'
+    response = {
+        'now': datetime.date.today(),
+        'msg': "Hello world!"
+    }
+    return response
 
 
 @api.route("/rates")
@@ -28,6 +40,28 @@ def get_rates():
     response = {
         'name': 'rates',
         'rates': result
+    }
+    # response = result
+    return response
+
+
+@api.route("/rate/<int:year>/<int:month>")
+def get_rate_by_year_month(year, month):
+    rate = rates_table.get_rate(year, month)
+    if rate is None:
+        raise Exception("Cannot find rate for year={}, month={}".format(year, month))
+
+    schema = IBondRateSchema()
+    result = schema.dump(rate)
+    # print(result)
+    parameters = {
+        'year': year,
+        'month': month
+    }
+    response = {
+        'name': 'rate',
+        'parameters': parameters,
+        'rate': result
     }
     # response = result
     return response
@@ -88,6 +122,7 @@ def get_values():
     result = schema.dump(lookup_table.values())
     response = {
         'name': 'values',
+        'parameters': parameters,
         'values': result
     }
     # response = result

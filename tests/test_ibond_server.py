@@ -4,7 +4,7 @@ import unittest
 def test_request_hello(client):
     response = client.get("/api/hello")
     assert response.status_code == 200
-    assert b"Hello, World!" in response.data
+    assert "Hello world!" == response.json['msg']
 
 
 def test_request_rates(client):
@@ -28,6 +28,23 @@ def test_request_rates(client):
             # assert rate['composite_rate'] == expected_rate['composite_rate']
             # assert rate['fixed_rate'] == expected_rate['fixed_rate']
             # assert rate['inflation_rate'] == expected_rate['inflation_rate']
+
+
+def test_request_rate(client):
+    response = client.get("/api/rate/2001/1")
+    assert response.status_code == 200
+    assert response.json["name"] == "rate"
+    rate = response.json["rate"]
+    assert len(rate) == 4
+
+    expected_rate = {
+        "composite_rate": 6.49,
+        "date": "2001-01-01T00:00:00",
+        "fixed_rate": 3.4,
+        "inflation_rate": 1.52
+    }
+    test_case = unittest.TestCase()
+    test_case.assertDictEqual(rate, expected_rate)
 
 
 def test_request_values(client):

@@ -78,8 +78,10 @@ class IBondRates:
                     # print("##")
                 else:
                     date = date + relativedelta.relativedelta(months=1)
+                    rate = IBondRate(date, fixed_rate, inflation_rate, composite_rate)
                 rate.composite_rate = composite_rate
                 key = self._get_map_key(date)
+                # assert key == rate.date
                 rates_map[key] = rate
 
         return rates_map
@@ -136,9 +138,10 @@ class IBondRates:
 
         # return data
         return self.rates_map.values()
+        # return self.rates_map.keys();
 
     def write_json_to_string(self):
-        MySchema = Schema.from_dict(
+        my_schema = Schema.from_dict(
             {
                 "type": fields.Str(),
                 "rates": fields.List(fields.Nested(IBondRateSchema())),
@@ -147,7 +150,7 @@ class IBondRates:
         data = {}
         data["type"] = "rates_table"
         data["rates"] = self.rates_map.values()
-        result = MySchema().dumps(data)
+        result = my_schema().dumps(data)
         return result
 
     def compute_composite_rate(self, fixed_rate, inflation_rate):
@@ -176,6 +179,11 @@ class IBondRates:
         value = unit_value * (1 + (composite_rate / 100.0) / 2)
         unit_value = round(value, 2)
         return unit_value
+
+    def get_rate(self, year, month):
+        d = datetime.datetime(year, month, 1)
+        k = self._get_map_key(d)
+        return self.rates_map.get(k, None)
 
 
 def main():
