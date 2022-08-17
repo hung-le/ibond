@@ -64,8 +64,18 @@ curl -s https://stark-sea-90016.herokuapp.com/api/rates
 ```
 
 ## GET values
+
+Get values for ibond issued on issue_year/issue_month until end_year/end_month
+
+* denomination: ibond denomination. Default: 1000
+* issue_year: list ibond value for that were issued on issue_year. Default: today's year
+* issue_month: list ibond value for that were issued on issue_month. Default: today's month
+* end_year: list ibond value from issue year/month until end year/month. Defaut: 12-months from issue_year/issue_month
+* end_month: list ibond value from issue year/month until end year/month. Defaut: 12-months from issue_year/issue_month
+
 ```
-curl -s https://stark-sea-90016.herokuapp.com/api/values -G -d denomination=2000 -d issue_year=2010 -d issue_month=1 -d end_year=2010 -d end_month=6
+curl -s https://stark-sea-90016.herokuapp.com/api/values -G \
+  -d denomination=2000 -d issue_year=2010 -d issue_month=1 -d end_year=2010 -d end_month=6
 ...
 {
     "name": "values",
