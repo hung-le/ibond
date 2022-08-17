@@ -72,6 +72,7 @@ Get values for ibond issued on issue_year/issue_month until end_year/end_month
 * issue_month: list ibond value for that were issued on issue_month. Default: today's month
 * end_year: list ibond value from issue year/month until end year/month. Defaut: 12-months from issue_year/issue_month
 * end_month: list ibond value from issue year/month until end year/month. Defaut: 12-months from issue_year/issue_month
+* assume_inflation_rate: for month with no inflation_rate yet, assume 'assume_inflation_rate'. Default: 0.00
 
 ```
 curl -s https://stark-sea-90016.herokuapp.com/api/values -G \
